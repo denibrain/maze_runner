@@ -479,6 +479,199 @@ files:
         }
     }
   learner_created: false
+- name: src/maze/GraphEdge.java
+  visible: true
+  text: |
+    package maze;
+
+    public class GraphEdge {
+        public int a;
+        public int b;
+
+        public GraphEdge(int a, int b) {
+            this.a = a;
+            this.b = b;
+        }
+    }
+  learner_created: true
+- name: src/maze/Manager.java
+  visible: true
+  text: "package maze;\n\npublic class Manager {\n    \n    Maze maze;\n    \n   \
+    \ public Manager() {\n        \n    }\n    \n    public void run() {\n       \
+    \ displayMenu();\n    }\n\n    private void displayMenu() {\n    }\n\n\n}\n"
+  learner_created: true
+- name: src/maze/Maze.java
+  visible: true
+  text: |
+    package maze;
+
+    public class Maze {
+        private final boolean[][] map;
+        private int width;
+        private int height;
+
+        public Maze(int width, int height) throws Exception {
+            if (width <= 2 || height <= 2) {
+                throw new Exception("Invalid width or height");
+            }
+
+            this.width = width;
+            this.height = height;
+            map = MazeBuilder.build(width, height);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            for (boolean[] row: map) {
+               for (boolean b:row) {
+                   sb.append(b ? "  " : "\u2588\u2588");
+               }
+               sb.append("\n");
+            }
+            return sb.toString();
+        }
+
+        public void print() {
+            for (boolean[] row: map) {
+                StringBuilder sb = new StringBuilder();
+                for (boolean b:row) {
+                    sb.append(b ? "  " : "\u2588\u2588");
+                }
+                System.out.println(sb.toString());
+            }
+        }
+    }
+  learner_created: true
+- name: src/maze/GridGraph.java
+  visible: true
+  text: |
+    package maze;
+
+    import java.util.*;
+
+    public class GridGraph {
+
+        List<List<Integer>> adjacencyList;
+        int total;
+
+        public GridGraph(int width, int height) {
+            total = height * width;
+            adjacencyList = new ArrayList<>(total);
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    List<Integer> edges = new ArrayList<>(4);
+                    int vertexIndex = i * width + j;
+                    if (i > 0) {
+                        edges.add(vertexIndex - width);
+                    }
+                    if (j > 0) {
+                        edges.add(vertexIndex - 1);
+                    }
+                    if (i < height - 1) {
+                        edges.add(vertexIndex + width);
+                    }
+                    if (j < width - 1) {
+                        edges.add(vertexIndex + 1);
+                    }
+                    adjacencyList.add(edges);
+                }
+            }
+        }
+
+        public GraphEdge[] getSnappingTree() {
+            Random r = new Random();
+            int startPoint = r.nextInt(total);
+            boolean[] connected = new boolean[total];
+            connected[startPoint] = true;
+            Stack<Integer> stack = new Stack<>();
+            stack.push(startPoint);
+            int i = 0;
+
+            GraphEdge[] edges = new GraphEdge[total - 1];
+            while (total > i + 1) {
+                int v = stack.pop();
+                List<Integer> a = adjacencyList.get(v);
+                Collections.shuffle(a, r);
+                for (int k: a) {
+                    if (!connected[k]) {
+                        connected[k] = true;
+                        edges[i] = new GraphEdge(v, k);
+                        stack.push(k);
+                        i++;
+                    }
+                }
+            }
+            return edges;
+        }
+    }
+  learner_created: true
+- name: src/maze/MazeBuilder.java
+  visible: true
+  text: |
+    package maze;
+
+    public class MazeBuilder {
+        public static boolean[][] build(int width, int height) throws Exception {
+            if (width <= 2 || height <= 2) {
+                throw new Exception("Invalid width or height");
+            }
+
+            boolean[][] m = new boolean[height][width];
+            if (width == 3) {
+                m[1][0] = true;
+                m[height - 2][2] = true;
+                for (int i = 1; i < height - 1; i++) {
+                    m[i][1] = true;
+                }
+            } else if (height == 3) {
+                m[0][1] = true;
+                m[2][width - 2] = true;
+                for (int i = 1; i < width - 1; i++) {
+                    m[1][i] = true;
+                }
+            } else {
+                int gWidth = (width - 1)/ 2;
+                int gHeight = (height - 1) / 2;
+                GridGraph g = new GridGraph(gWidth, gHeight);
+                GraphEdge[] edges = g.getSnappingTree();
+                // entrance & exit
+                m[1][0] = true;
+                m[(gHeight - 1) * 2 + 1][width - 1] = true;
+                if (width % 2 == 0) {
+                    // if width is even the thick of the left wall is 2
+                    m[(gHeight - 1) * 2 + 1][width - 2] = true;
+                }
+                // vertex is always an empty cell
+                for (int i = 0; i < gHeight; i++) {
+                    for (int j = 0; j < gWidth; j++) {
+                        m[i * 2 + 1][j * 2 + 1] = true;
+                    }
+                }
+                // edge means empty cell
+                for (GraphEdge e: edges) {
+                    int first = Math.min(e.a, e.b);
+                    int second = Math.max(e.a, e.b);
+                    int posY = (first / gWidth) * 2 + 1;
+                    int posX = (first % gWidth) * 2 + 1;
+                    if (second - first == 1) {
+                        posX++;
+                    } else {
+                        posY++;
+                    }
+                    m[posY][posX] = true;
+                }
+            }
+            return m;
+        }
+    }
+  learner_created: true
+- name: test_maze.txt
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/47/stages/253/implement
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Fri, 18 Dec 2020 17:31:03 UTC
 record: -1

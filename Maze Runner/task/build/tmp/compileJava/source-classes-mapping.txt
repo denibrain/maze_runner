@@ -1,10 +1,12 @@
 maze/GraphEdge.java
  maze.GraphEdge
-maze/Maze.java
- maze.Maze
-maze/Main.java
- maze.Main
-maze/MazeBuilder.java
- maze.MazeBuilder
 maze/GridGraph.java
  maze.GridGraph
+maze/MazeBuilder.java
+ maze.MazeBuilder
+maze/Maze.java
+ maze.Maze
+maze/Manager.java
+ maze.Manager
+maze/Main.java
+ maze.Main

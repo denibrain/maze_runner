@@ -1,6 +1,8 @@
 package maze;
 
-public class Maze {
+import java.io.Serializable;
+
+public class Maze implements Serializable {
     private final boolean[][] map;
     private int width;
     private int height;
